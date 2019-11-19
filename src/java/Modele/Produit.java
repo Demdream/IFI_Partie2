@@ -3,6 +3,7 @@ package Modele;
 
 import java.util.ArrayList;
 
+// On définit la classe Produit 
 public class Produit {
     
     private int ref;
@@ -10,17 +11,14 @@ public class Produit {
     private double prix;
     private int quantite;
     private String image;
-    private final ArrayList<Produit> stock;
     
-
-    public Produit(int ref, String nom, double prix, int quantite, String image) {
-        this.ref = ref;
+   // méthode 
+    public Produit(int ref, String nom, double prix, int quantite, String image, String panier) {
+        this.ref = ref; // variable de classe = variable en paramètre du constructeur
         this.nom = nom;
         this.prix = prix;
         this.quantite = quantite;
         this.image = image;
-        this.stock = new ArrayList<>();
-   
     }
 
     
@@ -28,7 +26,7 @@ public class Produit {
     
     @Override
     public String toString() {
-        return "Produit{" + "ref=" + ref + ", nom=" + nom + ", prix=" + prix + ", quantite=" + quantite + ", image=" + image +'}';
+        return "Produit{" + "ref=" + ref + ", nom=" + nom + ", prix=" + prix + ", quantite=" + quantite + ", image=" + image + '}';
     }
 
     public String getNom() {
@@ -70,5 +68,4 @@ public String getImage() {
     public void setImage(String image) {
         this.image = image;
     } 
-
 }
