@@ -7,11 +7,8 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <jsp:useBean id="stockSession" class="Modele.Stock" scope="session" ></jsp:useBean>
 <jsp:useBean id="panierSession" class="Modele.Panier" scope="session" ></jsp:useBean> 
-<sql:query var="phones" dataSource="jdbc/bonecp_resource">
-    SELECT * FROM mobilephones
-</sql:query>
-<c:forEach var="mobilephones" items="${phones}">
-           
+
+
 
  <%! 
        Panier panier = new Panier();
