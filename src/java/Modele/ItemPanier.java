@@ -1,42 +1,49 @@
-
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package Modele;
 
-// Cette classe va nous permettre de représenter un produit dans le panier  
-//avec sa référence ( indiqué dans le tableau )et la quantité que l'utilisateur veut 
-//acheter ( si il appuie une seule fois sur ajouter pannier du coup la quantité va être 1
-// si 2 fois la quantité va être 2 et ainsi de suite
+import Entity.Mobilephones;
 
-
+/**
+ *
+ * @author PSDT0769
+ */
 public class ItemPanier {
-    
-    private int ref;
-    private int quantite;
+    Mobilephones mobilephones;
+    short quantity;
 
-    public ItemPanier(int ref, int quantite) {
-        this.ref = ref;
-        this.quantite = quantite;
+    public ItemPanier(Mobilephones mobilephones) {
+        this.mobilephones = mobilephones;
+        quantity = 1;
     }
 
-    public int getRef() {
-        return ref;
+    public Mobilephones getMobilephones() {
+        return mobilephones;
     }
 
-    public void setRef(int ref) {
-        this.ref = ref;
+    public short getQuantity() {
+        return quantity;
     }
 
-    public int getQuantite() {
-        return quantite;
+    public void setQuantity(short quantity) {
+        this.quantity = quantity;
     }
 
-    public void setQuantite(int quantite) {
-        this.quantite = quantite;
+    public void incrementQuantity() {
+        quantity++;
     }
 
-    @Override
-    public String toString() {
-        return "ItemPanier{" + "ref=" + ref + ", quantite=" + quantite + '}';
+    public void decrementQuantity() {
+        quantity--;
     }
-    
-    
+
+    public double getTotal() {
+        double amount = 0;
+        amount = (this.getQuantity() * mobilephones.getPrix().doubleValue());
+        return amount;
+    }
+
 }

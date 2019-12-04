@@ -7,7 +7,6 @@ package Entity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,8 +16,6 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -33,10 +30,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries({
     @NamedQuery(name = "Mobilephones.findAll", query = "SELECT m FROM Mobilephones m")
     , @NamedQuery(name = "Mobilephones.findById", query = "SELECT m FROM Mobilephones m WHERE m.id = :id")
-    , @NamedQuery(name = "Mobilephones.findByReference", query = "SELECT m FROM Mobilephones m WHERE m.reference = :reference")
     , @NamedQuery(name = "Mobilephones.findByNom", query = "SELECT m FROM Mobilephones m WHERE m.nom = :nom")
     , @NamedQuery(name = "Mobilephones.findByPrix", query = "SELECT m FROM Mobilephones m WHERE m.prix = :prix")
-    , @NamedQuery(name = "Mobilephones.findByLastUpdate", query = "SELECT m FROM Mobilephones m WHERE m.lastUpdate = :lastUpdate")
     , @NamedQuery(name = "Mobilephones.findByQuantity", query = "SELECT m FROM Mobilephones m WHERE m.quantity = :quantity")})
 public class Mobilephones implements Serializable {
 
@@ -49,11 +44,6 @@ public class Mobilephones implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 45)
-    @Column(name = "reference")
-    private String reference;
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 45)
     @Column(name = "nom")
     private String nom;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
@@ -61,11 +51,6 @@ public class Mobilephones implements Serializable {
     @NotNull
     @Column(name = "prix")
     private BigDecimal prix;
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "last_update")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date lastUpdate;
     @Column(name = "quantity")
     private Short quantity;
 
@@ -76,12 +61,10 @@ public class Mobilephones implements Serializable {
         this.id = id;
     }
 
-    public Mobilephones(Integer id, String reference, String nom, BigDecimal prix, Date lastUpdate) {
+    public Mobilephones(Integer id, String nom, BigDecimal prix) {
         this.id = id;
-        this.reference = reference;
         this.nom = nom;
         this.prix = prix;
-        this.lastUpdate = lastUpdate;
     }
 
     public Integer getId() {
@@ -90,14 +73,6 @@ public class Mobilephones implements Serializable {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public String getReference() {
-        return reference;
-    }
-
-    public void setReference(String reference) {
-        this.reference = reference;
     }
 
     public String getNom() {
@@ -114,14 +89,6 @@ public class Mobilephones implements Serializable {
 
     public void setPrix(BigDecimal prix) {
         this.prix = prix;
-    }
-
-    public Date getLastUpdate() {
-        return lastUpdate;
-    }
-
-    public void setLastUpdate(Date lastUpdate) {
-        this.lastUpdate = lastUpdate;
     }
 
     public Short getQuantity() {
@@ -154,7 +121,7 @@ public class Mobilephones implements Serializable {
 
     @Override
     public String toString() {
-        return "Beans.Mobilephones[ id=" + id + " ]";
+        return "Entity.Mobilephones[ id=" + id + " ]";
     }
     
 }
