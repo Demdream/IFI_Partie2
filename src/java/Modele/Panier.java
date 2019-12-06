@@ -51,48 +51,7 @@ public class Panier {
         }
     }
 
-    /**
-     * Updates the <code>ItemPanier</code> of the specified
-     * <code>mobilephones</code> to the specified quantity. If '<code>0</code>'
-     * is the given quantity, the <code>ItemPanier</code> is removed
-     * from the <code>Panier</code>'s <code>items</code> list.
-     *
-     * @param mobilephones the <code>Mobilephones</code> that defines the type of Panier item
-     * @param quantity the number which the <code>ItemPanier/code> is updated to
-     * @see ItemPanier
-     */
-    public synchronized void update(Mobilephones mobilephones, String quantity) {
-
-        short qty = -1;
-
-        // cast quantity as short
-        qty = Short.parseShort(quantity);
-
-        if (qty >= 0) {
-
-            ItemPanier item = null;
-
-            for (ItemPanier scItem : items) {
-
-                if (scItem.getMobilephones().getId() == mobilephones.getId()) {
-
-                    if (qty != 0) {
-                        // set item quantity to new value
-                        scItem.setQuantity(qty);
-                    } else {
-                        // if quantity equals 0, save item and break
-                        item = scItem;
-                        break;
-                    }
-                }
-            }
-
-            if (item != null) {
-                // remove from panier
-                items.remove(item);
-            }
-        }
-    }
+  
 
     /**
      * Returns the list of <code>ItemPanier</code>.
@@ -155,7 +114,7 @@ public class Panier {
     public synchronized void calculateTotal(String surcharge) {
 
         double amount = 0;
-
+   
         // cast surcharge as double
         double s = Double.parseDouble(surcharge);
 

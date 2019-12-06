@@ -5,6 +5,7 @@
  */
 package controller;
 
+import Modele.Panier;
 import Entity.Mobilephones;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -13,6 +14,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.ejb.EJB;
 import Session.MobilephonesFacade;
 
@@ -22,18 +24,20 @@ import Session.MobilephonesFacade;
  */
 @WebServlet(name = "Servlet",
         loadOnStartup = 1,
-        urlPatterns = {"/afficheProduit",
-            "/viewTelephone",
-            "/ajoutPanier"})
+        urlPatterns = {"/afficheProduit"})
 
 public class Servlet extends HttpServlet {
 
+    
     @EJB
     private MobilephonesFacade mobilephonesFacade;
 
     @Override
     public void init() throws ServletException {
+         
+        
 
+        
         // store mobilephones list in servlet context
         getServletContext().setAttribute("telephones", mobilephonesFacade.findAll());
     }
@@ -51,27 +55,23 @@ public class Servlet extends HttpServlet {
             throws ServletException, IOException {
 
         String userPath = request.getServletPath();
-        Mobilephones selectedMobilephones;
+        HttpSession session = request.getSession();
+        
 
         // if afficheProduit.jsp page is requested
-        if (userPath.equals("/afficheProduit")) {
 
-            // get mobilephonesId from request
-            String mobilephonesId = request.getQueryString();
-            if (mobilephonesId != null) {
-                //get selected mobilephones
-                selectedMobilephones = mobilephonesFacade.find(Short.parseShort(mobilephonesId));
-                
-                request.setAttribute("selectedMobilephones", selectedMobilephones);
-            }
-            
-            // if page afficheProduit est appelé
-            else if(userPath.equals("/viewTelephone")){
+          if(userPath.equals("/afficheProduit")){
                
                 String clear = request.getParameter("clear");
                 
+                if ((clear != null) && clear.equals("true")) {
+
+                Panier phone = (Panier) session.getAttribute("phone");
+                phone.clear();
+            }
                 
                 
+  
                 userPath = "/afficheProduit";
             
 
@@ -91,7 +91,7 @@ public class Servlet extends HttpServlet {
                 ex.printStackTrace();
             }
         }
-    }
+    
 
     /**
      * Handles the HTTP <code>POST</code> method.
@@ -107,14 +107,37 @@ public class Servlet extends HttpServlet {
             throws ServletException, IOException {
 
         String userPath = request.getServletPath();
+        HttpSession session = request.getSession();
+        Panier phone = (Panier) session.getAttribute("phone");
+        
+      
 
         // if clique Ajouter au panier
-        if (userPath.equals("/ajoutPanier")) {
+        if (userPath.equals("/afficheProduit")) {
             // TODO: ajouter n produit au panier
         
+            if (phone == null){
+                
+                phone = new Panier();
+                session.setAttribute("phone", phone);
+            }
+                //
+                
+                String mobilephoneId = request.getParameter("moblephoneId");
+                
+             if (!mobilephoneId.isEmpty()) {
+                 
+                  Mobilephones mobilephones = mobilephonesFacade.find(Integer.parseInt(mobilephoneId));
+                  phone.addItem(mobilephones);
+             }
+                
             userPath = "/afficheProduit";
-            // if clique Passer commande
-        }
+            
+        
+        
+        // if clique Passer commande
+        
+    } 
 
         // use RequestDispatcher to forward request internally
         String url = "/" + userPath + ".jsp";
