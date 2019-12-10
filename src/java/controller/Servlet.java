@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.ejb.EJB;
 import Session.MobilephonesFacade;
+import javax.servlet.ServletConfig;
 
 /**
  *
@@ -24,18 +25,27 @@ import Session.MobilephonesFacade;
  */
 @WebServlet(name = "Servlet",
         loadOnStartup = 1,
-        urlPatterns = {"/afficheProduit"})
+        urlPatterns = {"/afficheProduit", 
+                       "/voirTelephone",
+                       "/ajoutPanier",
+                       "/validerPanier",
+                       "/verification",
+                       "/achat"})
 
 public class Servlet extends HttpServlet {
 
+    private String frais;
     
     @EJB
     private MobilephonesFacade mobilephonesFacade;
 
     @Override
-    public void init() throws ServletException {
+    public void init(ServletConfig servletConfig) throws ServletException {
          
-        
+        super.init(servletConfig);
+
+        // initialize servlet with configuration information
+        frais = servletConfig.getServletContext().getInitParameter("fraisLivraison");
 
         
         // store mobilephones list in servlet context
@@ -56,31 +66,53 @@ public class Servlet extends HttpServlet {
 
         String userPath = request.getServletPath();
         HttpSession session = request.getSession();
+        Mobilephones selectedMobilephones;
         
 
-        // if afficheProduit.jsp page is requested
+        // si page afficheProduit est appelé
 
           if(userPath.equals("/afficheProduit")){
-               
-                String clear = request.getParameter("clear");
+              
+              // get categoryId from request
+            String mobilephoneId = request.getQueryString();
+
+            if (mobilephoneId != null){
+              
+               // get téléphones
+                selectedMobilephones = mobilephonesFacade.find(Short.parseShort(mobilephoneId));
+
+                // placer téléphones sélectionnés dans le scope d'une session
+                session.setAttribute("selectedMobilephones", selectedMobilephones);
+
+            } 
                 
-                if ((clear != null) && clear.equals("true")) {
+            } else if (userPath.equals("/voirTelephone")) {
+
+            String clear = request.getParameter("clear");
+
+            if ((clear != null) && clear.equals("true")) {
 
                 Panier phone = (Panier) session.getAttribute("phone");
                 phone.clear();
             }
-                
-                
-  
-                userPath = "/afficheProduit";
-            
 
-            } 
+            userPath = "/afficheProduit";
             
             
+            }else if (userPath.equals("/verification")) {
+
+            Panier phone = (Panier) session.getAttribute("phone");
+            
+            phone.calculateTotal(frais);
+
+
            
 
-//              if clique Ajouter au panier
+            // forward to checkout page and switch to a secure channel
+
+        }
+            
+            
 
             // use RequestDispatcher to forward request internally
             String url = "/" + userPath + ".jsp";
@@ -90,7 +122,8 @@ public class Servlet extends HttpServlet {
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
-        }
+     
+    }
     
 
     /**
@@ -110,10 +143,8 @@ public class Servlet extends HttpServlet {
         HttpSession session = request.getSession();
         Panier phone = (Panier) session.getAttribute("phone");
         
-      
-
-        // if clique Ajouter au panier
-        if (userPath.equals("/afficheProduit")) {
+        // si  Ajout au panier
+        if (userPath.equals("/ajoutPanier")) {
             // TODO: ajouter n produit au panier
         
             if (phone == null){
@@ -133,11 +164,28 @@ public class Servlet extends HttpServlet {
                 
             userPath = "/afficheProduit";
             
-        
+            
         
         // if clique Passer commande
         
-    } 
+    } else if (userPath.equals("/validerPanier")) {
+
+            // get input from request
+            String mobilephoneId = request.getParameter("mobilephoneId");
+            String quantity = request.getParameter("quantity");
+
+            Mobilephones mobilephones = mobilephonesFacade.find(Integer.parseInt(mobilephoneId));
+            phone.ajout(mobilephones, quantity);
+
+            userPath = "/afficheProduit";
+
+
+        // si achat panier
+        }else if (userPath.equals("/achat")) {
+            // TODO: appeller méthode achat
+
+            userPath = "/confirmation";
+        }
 
         // use RequestDispatcher to forward request internally
         String url = "/" + userPath + ".jsp";

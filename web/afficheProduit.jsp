@@ -1,147 +1,103 @@
 <%-- 
     Document   : afficheProduit
-    Created on : 3 déc. 2019, 13:12:03
+    Created on : 9 d�c. 2019, 01:13:54
     Author     : PSDT0769
 --%>
 
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <link rel="stylesheet" type="text/css" href="newcss.css">
-        <title>JSP page</title>
-    </head>
-    <body>
+<div id="singleColumn">
 
-        <div id="main">
-            <div id="header">
+    <c:choose>
+        <c:when test="${phone.numberOfItems > 1}">
+            <p>Votre panier contient ${phone.numberOfItems} items.</p>
+        </c:when>
+        <c:when test="${phone.numberOfItems == 1}">
+            <p>Votre panier contient ${phone.numberOfItems} item.</p>
+        </c:when>
+        <c:otherwise>
+            <p>Votre panier est vide.</p>
+        </c:otherwise>
+    </c:choose>
 
-                <a href="#">
-                    <img src=${initParam.mobilephonesPhotoPath} id="logo" alt="logo">
-                </a>
+    <div id="actionBar">
+        <%-- clear phone widget --%>
+        <c:if test="${!empty phone && phone.numberOfItems != 0}">
+            <a href="voirTelephone?clear=true" class="bubble hMargin">clear phone</a>
+        </c:if>
 
-                <img src="#" id="logoText" alt="mobilephone store">
-            </div>
+        <%-- continue shopping widget --%>
+        <c:set var="value">
+            <c:choose>
+                <%-- if 'selectedMobilephones session object exists, send user to previously viewed mobilephones--%>
+                <c:when test="${!empty selectedMobilephones}">
+                    mobilephone
+                </c:when>
+                <%-- otherwise send user to afficheProduit.jsp--%>
+                <c:otherwise>
+                    afficheProduit.jsp
+                </c:otherwise>
+            </c:choose>
+        </c:set>
 
-            <div id="singleColumn">
+        <a href="${value}" class="bubble hMargin">continuer votre shopping</a>
 
-                <c:choose>
-                    <c:when test="${phone.numberOfItems > 1}">
-                        <p>Votre panier contient ${phone.numberOfItems} items.</p>
-                    </c:when>
-                    <c:when test="${phone.numberOfItems == 1}">
-                        <p>Votre panier contient ${phone.numberOfItems} item.</p>
-                    </c:when>
-                    <c:otherwise>
-                        <p>Votre panier est vide.</p>
-                    </c:otherwise>
-                </c:choose>
+        <%-- verification widget --%>
+        <c:if test="${!empty phone && phone.numberOfItems != 0}">
+            <a href="<c:url value='verification'/>" class="bubble hMargin">proceed to verification &#x279f;</a>
+        </c:if>
+    </div>
 
+    <c:if test="${!empty phone && phone.numberOfItems != 0}">
 
-                <div id="actionBar">
+      <h4 id="subtotal">subtotal: &euro; ${phone.subtotal}</h4>
 
+      <table id="afficheProduitTable">
 
-                    <a href="${value}" class="bubble hMargin">Passer votre commande</a>
+        <tr class="header">
+            <th>mobilephones</th>
+            <th>nom</th>
+            <th>prix</th>
+            <th>quantity</th>
+        </tr>
 
-                </div>
-                <c:if test="${!empty phone && phone.numberOfItems != 0}">
-                    <h4 id="subtotal">subtotal: &euro; ${phone.subtotal}</h4>
+        <c:forEach var="phoneItem" items="${phone.items}" varStatus="iter">
 
-                    <table id="mobilephonesTable">
+          <c:set var="mobilephones" value="${phoneItem.mobilephones}"/>
 
-                        <tr class="header">
-                            <th>téléphone</th>
-                            <th>nom</th>
-                            <th>prix</th>
-                            <th>quantité</th>
-                        </tr>
-                        <c:forEach var="phoneItem" items="${phone.items}" varStatus="iter">
+          <tr class="${((iter.index % 2) == 0) ? 'lightBlue' : 'white'}">
+            <td>
+              <img src="${initParam.mobilephonesPhotoPath}${mobilephones.nom}.jpg"
+                   alt="${mobilephones.nom}">
+            </td>
 
-                            <c:set var="mobilephones" value="${phoneItem.mobilephones}"/>
+            <td>${mobilephones.nom}</td>
 
-                            <tr class="${((iter.index % 2) == 0) ? 'lightBlue' : 'white'}">
-                                <td class="lightBlue">
-                                    <img src="${initParam.mobilephonesPhotoPath}${mobilephones.nom}.jpg"
-                                         alt="mobilephones image">
-                                </td>
+            <td>
+                &euro; ${phoneItem.total}
+                <br>
+                <span class="smallText">( &euro; ${mobilephones.prix} / unit )</span>
+            </td>
 
-                                <td>${mobilephones.nom}</td>
-                                    
-<!--                                <td class="lightBlue">[ nom téléphone ]</td>
-                                <td class="lightBlue">[ prix ]</td>
-                                <td class="lightBlue">-->
+            <td>
+                <form action="<c:url value='ajoutPanier'/>" method="post">
+                    <input type="hidden"
+                           name="mobilephoneId"
+                           value="${mobilephone.id}">
+                    <input type="text"
+                           maxlength="2"
+                           size="2"
+                           value="${phoneItem.quantity}"
+                           name="quantity"
+                           style="margin:5px">
+                    <input type="submit"
+                           name="submit"
+                           value="ajout">
+                </form>
+            </td>
+          </tr>
 
-                                <td>
-                                    &euro; ${phoneItem.total}
-                                    <br>
-                                    <span class="smallText">( &euro; ${mobilephones.prix} / unit )</span>
-                                </td>
+        </c:forEach>
 
-                                <td>                              
-                                    <form action="afficheProduit.jsp" method="post">
-                                        <input type="hidden"
-                                               name="mobilephoneId"
-                                               value="${mobilephones.id}">
-                                        <input type="text"
-                                               maxlength="2"
-                                               size="2"
-                                               value="${phoneItem.quantity}"
-                                               name="quantity"
-                                               style="margin:5px">
-                                        <input type="submit"
-                                               name="submit"
-                                               value="Ajouter au panier">
-                                    </form>
-                                </td>
-                            </tr>
+      </table>
 
-                            <!--                    <tr>
-                                                    <td class="white">
-                                                        <img src="#" alt="mobilephones image">
-                                                    </td>
-                                                    <td class="white">[ mobilephones name ]</td>
-                                                    <td class="white">[ prix ]</td>
-                                                    <td class="white">
-                            
-                                                        <form action="ajoutPanier" method="post">
-                                                            <input type="text"
-                                                                   maxlength="2"
-                                                                   size="2"
-                                                                   value="1"
-                                                                   name="quantity">
-                                                            <input type="submit"
-                                                                   name="submit"
-                                                                   value="Ajouter au panier">
-                                                        </form>
-                                                    </td>
-                                                </tr>
-                            
-                                                <tr>
-                                                    <td class="lightBlue">
-                                                        <img src="#" alt="mobilephones image">
-                                                    </td>
-                                                    <td class="lightBlue">[ product name ]</td>
-                                                    <td class="lightBlue">[ price ]</td>
-                                                    <td class="lightBlue">
-                            
-                                                        <form action="ajoutPanier" method="post">
-                                                            <input type="text"
-                                                                   maxlength="2"
-                                                                   size="2"
-                                                                   value="1"
-                                                                   name="quantity">
-                                                            <input type="submit"
-                                                                   name="submit"
-                                                                   value="Ajouter au panier">
-                                                        </form>
-                                                    </td>
-                                                </tr>-->
-                        </c:forEach>
-                    </table>
-                </c:if>
-            </div>
-
-        </div>
-    </body>
-</html>
+    </c:if>
+</div>

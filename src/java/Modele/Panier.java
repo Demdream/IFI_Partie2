@@ -24,34 +24,75 @@ public class Panier {
     }
 
     /**
-     * Adds a <code>ItemPanier</code> to the <code>Panier</code>'s
-     * <code>items</code> list. If item of the specified <code>mobilephones</code>
-     * already exists in Panier list, the quantity of that item is
-     * incremented.
+     * Ajouter <code>ItemPanier</code> à <code>Panier</code>
+     * <code>items</code> list. Si item <code>mobilephones</code>
+     * existe déjà dans le Panier, la quantité de cet item est incrémenté
      *
-     * @param mobilephones the <code>Mobilephones</code> that defines the type of Panier item
+     * @param mobilephones <code>Mobilephones</code> définit le type de l'item du Panier
      * @see ItemPanier
      */
     public synchronized void addItem(Mobilephones mobilephones) {
 
         boolean newItem = true;
 
-        for (ItemPanier scItem : items) {
+        for (ItemPanier mItem : items) {
 
-            if (scItem.getMobilephones().getId() == mobilephones.getId()) {
+            if (mItem.getMobilephones().getId() == mobilephones.getId()) {
 
                 newItem = false;
-                scItem.incrementQuantity();
+                mItem.incrementQuantity();
             }
         }
 
         if (newItem) {
-            ItemPanier scItem = new ItemPanier (mobilephones);
-            items.add(scItem);
+            ItemPanier mItem = new ItemPanier (mobilephones);
+            items.add(mItem);
         }
     }
 
-  
+   /**
+     * Ajout <code>ItemPanier</code> à
+     * <code>mobilephones</code> à la quantité spécifiée. Si '<code>0</code>'
+     * quantité, l' <code>ItemPanier</code> est supprimé
+     * du <code>Panier</code>'s <code>items</code> list.
+     *
+     * @param mobilephones  <code>Mobilephones</code> qui définit le type de phone item
+     * @param quantity le nombre de <code>ItemPanier</code> est ajouté à
+     * @see ItemPanier
+     */
+    public synchronized void ajout(Mobilephones mobilephones, String quantity) {
+
+        short qty = -1;
+
+        // cast quantity as short
+        qty = Short.parseShort(quantity);
+
+        if (qty >= 0) {
+
+            ItemPanier item = null;
+
+            for (ItemPanier mItem : items) {
+
+                if (mItem.getMobilephones().getId() == mobilephones.getId()) {
+
+                    if (qty != 0) {
+                        // set item quantity to new value
+                        mItem.setQuantity(qty);
+                    } else {
+                        // if quantity equals 0, save item and break
+                        item = mItem;
+                        break;
+                    }
+                }
+            }
+
+            if (item != null) {
+                // remove from phone
+                items.remove(item);
+            }
+        }
+    }
+
 
     /**
      * Returns the list of <code>ItemPanier</code>.
@@ -75,9 +116,9 @@ public class Panier {
 
         numberOfItems = 0;
 
-        for (ItemPanier scItem : items) {
+        for (ItemPanier mItem : items) {
 
-            numberOfItems += scItem.getQuantity();
+            numberOfItems += mItem.getQuantity();
         }
 
         return numberOfItems;
@@ -85,7 +126,7 @@ public class Panier {
 
     /**
      * Returns the sum of the mobilephones price multiplied by the quantity for all
-     * items in Panier list. This is the total cost excluding the surcharge.
+     * items in Panier list. This is the total cost excluding the frais.
      *
      * @return the cost of all items times their quantities
      * @see ItemPanier
@@ -94,10 +135,10 @@ public class Panier {
 
         double amount = 0;
 
-        for (ItemPanier scItem : items) {
+        for (ItemPanier mItem : items) {
 
-            Mobilephones mobilephones = (Mobilephones) scItem.getMobilephones();
-            amount += (scItem.getQuantity() * mobilephones.getPrix().doubleValue());
+            Mobilephones mobilephones = (Mobilephones) mItem.getMobilephones();
+            amount += (mItem.getQuantity() * mobilephones.getPrix().doubleValue());
         }
 
         return amount;
@@ -105,18 +146,18 @@ public class Panier {
 
     /**
      * Calculates the total cost of the order. This method adds the subtotal to
-     * the designated surcharge and sets the <code>total</code> instance variable
+     * the designated frais and sets the <code>total</code> instance variable
      * with the result.
      *
-     * @param surcharge the designated surcharge for all orders
+     * @param frais the designated frais for all orders
      * @see ItemPanier
      */
-    public synchronized void calculateTotal(String surcharge) {
+    public synchronized void calculateTotal(String frais) {
 
         double amount = 0;
    
         // cast surcharge as double
-        double s = Double.parseDouble(surcharge);
+        double s = Double.parseDouble(frais);
 
         amount = this.getSubtotal();
         amount += s;
@@ -128,7 +169,7 @@ public class Panier {
      * Returns the total cost of the order for the given
      * <code>Panier</code> instance.
      *
-     * @return the cost of all items times their quantities plus surcharge
+     * @return the cost of all items times their quantities plus frais
      */
     public synchronized double getTotal() {
 
