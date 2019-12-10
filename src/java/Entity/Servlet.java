@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package controller;
+package Entity;
 
 import Modele.Panier;
 import Entity.Mobilephones;
@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.ejb.EJB;
 import Session.MobilephonesFacade;
+import Entity.*;
 import javax.servlet.ServletConfig;
 
 /**
@@ -37,8 +38,14 @@ public class Servlet extends HttpServlet {
     private String frais;
     
     @EJB
-    private MobilephonesFacade mobilephonesFacade;
+    private ProductFacadeLocal mobilephonesFacade;
 
+    
+    /**
+     * 
+     * @param servletConfig
+     * @throws ServletException 
+   
     @Override
     public void init(ServletConfig servletConfig) throws ServletException {
          
@@ -51,7 +58,7 @@ public class Servlet extends HttpServlet {
         // store mobilephones list in servlet context
         getServletContext().setAttribute("telephones", mobilephonesFacade.findAll());
     }
-
+  */
     /**
      * Handles the HTTP <code>GET</code> method.
      *
@@ -60,10 +67,13 @@ public class Servlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
+
+    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
+        
+    mobilephonesFacade.init();
         String userPath = request.getServletPath();
         HttpSession session = request.getSession();
         Mobilephones selectedMobilephones;
@@ -79,10 +89,9 @@ public class Servlet extends HttpServlet {
             if (mobilephoneId != null){
               
                // get téléphones
-                selectedMobilephones = mobilephonesFacade.find(Short.parseShort(mobilephoneId));
 
                 // placer téléphones sélectionnés dans le scope d'une session
-                session.setAttribute("selectedMobilephones", selectedMobilephones);
+               // session.setAttribute("selectedMobilephones", selectedMobilephones);
 
             } 
                 
@@ -158,8 +167,8 @@ public class Servlet extends HttpServlet {
                 
              if (!mobilephoneId.isEmpty()) {
                  
-                  Mobilephones mobilephones = mobilephonesFacade.find(Integer.parseInt(mobilephoneId));
-                  phone.addItem(mobilephones);
+               //   Mobilephones mobilephones = mobilephonesFacade.find(Integer.parseInt(mobilephoneId));
+             //     phone.addItem(mobilephones);
              }
                 
             userPath = "/afficheProduit";
@@ -174,8 +183,8 @@ public class Servlet extends HttpServlet {
             String mobilephoneId = request.getParameter("mobilephoneId");
             String quantity = request.getParameter("quantity");
 
-            Mobilephones mobilephones = mobilephonesFacade.find(Integer.parseInt(mobilephoneId));
-            phone.ajout(mobilephones, quantity);
+          //  Mobilephones mobilephones = mobilephonesFacade.find(Integer.parseInt(mobilephoneId));
+        //    phone.ajout(mobilephones, quantity);
 
             userPath = "/afficheProduit";
 

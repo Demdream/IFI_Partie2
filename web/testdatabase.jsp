@@ -1,4 +1,7 @@
 <%@taglib prefix="sql" uri="http://java.sun.com/jsp/jstl/sql"%>
+<%@page import="Session.*" %>
+<%@page import="Entity.*" %>
+<%@page import="java.util.*" %>
 <%-- 
     Document   : testdatabase
     Created on : 8 déc. 2019, 21:58:51
@@ -13,7 +16,14 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <sql:query var="result" dataSource="jdbc/ecommerce">
+         <%!  MobilephonesFacade monAbst;%>
+        <% monAbst = new MobilephonesFacade();
+            List<Mobilephones> monStock = monAbst.findAll();
+
+            out.println(monStock);%>
+
+       
+   <%--     <sql:query var="result" dataSource="jdbc/ecommerce">
             SELECT * from mobilephones
         </sql:query>
             
@@ -32,6 +42,8 @@
                     </c:forEach>
                 </tr>
             </c:forEach>
-        </table>
+       
+        </table>  --%>
+      
     </body>
 </html>
