@@ -42,6 +42,16 @@ public class Product implements Serializable {
     private String name;
     @Column(name = "PRIX")
     private Integer prix;
+    @Column(name = "QUANTITY")
+    private Integer quantity;
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
 
     public Product() {
     }
@@ -74,6 +84,14 @@ public class Product implements Serializable {
         this.prix = prix;
     }
 
+    public void deduitQuant(){
+        int q = this.quantity;
+        if (q > 0){
+        q = q - 1;
+        }
+    }
+    
+    
     @Override
     public int hashCode() {
         int hash = 0;

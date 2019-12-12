@@ -1,103 +1,141 @@
-<%-- 
-    Document   : afficheProduit
-    Created on : 9 d�c. 2019, 01:13:54
-    Author     : PSDT0769
---%>
 
-<div id="singleColumn">
+<%@page import="Modele.Panier"%>
+<%@page import="Modele.Stock"%>
+<%@page import="Modele.Produit"%>
+<%@page import="java.util.ArrayList"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<jsp:useBean id="stockSession" class="Modele.Stock" scope="session" ></jsp:useBean>
+<jsp:useBean id="panierSession" class="Modele.Panier" scope="session" ></jsp:useBean> 
 
-    <c:choose>
-        <c:when test="${phone.numberOfItems > 1}">
-            <p>Votre panier contient ${phone.numberOfItems} items.</p>
-        </c:when>
-        <c:when test="${phone.numberOfItems == 1}">
-            <p>Votre panier contient ${phone.numberOfItems} item.</p>
-        </c:when>
-        <c:otherwise>
-            <p>Votre panier est vide.</p>
-        </c:otherwise>
-    </c:choose>
 
-    <div id="actionBar">
-        <%-- clear phone widget --%>
-        <c:if test="${!empty phone && phone.numberOfItems != 0}">
-            <a href="voirTelephone?clear=true" class="bubble hMargin">clear phone</a>
-        </c:if>
+ <%! 
+       Panier panier = new Panier();
+       Stock stock = new Stock();
+       boolean affichePopUp = false ;
+ %>
+ 
+                     <%-- Première session quand l'utilisateur clique sur le bouton ajouter panier, on dit qu'il doit faire
+                     appel à la méthode ajouter panier qui existe dans la classe Panier
+                     Deuxième session quand l'utilisateur clique sur le bouton passer commande
+                     on lui dit qu'il doit faire appel à la méthode modifier stock qui existe dans la classe Stock
 
-        <%-- continue shopping widget --%>
-        <c:set var="value">
-            <c:choose>
-                <%-- if 'selectedMobilephones session object exists, send user to previously viewed mobilephones--%>
-                <c:when test="${!empty selectedMobilephones}">
-                    mobilephone
-                </c:when>
-                <%-- otherwise send user to afficheProduit.jsp--%>
-                <c:otherwise>
-                    afficheProduit.jsp
-                </c:otherwise>
-            </c:choose>
-        </c:set>
+<jsp:useBean id="panierSession" class="Modele.Panier" scope="session" ></jsp:useBean> 
 
-        <a href="${value}" class="bubble hMargin">continuer votre shopping</a>
 
-        <%-- verification widget --%>
-        <c:if test="${!empty phone && phone.numberOfItems != 0}">
-            <a href="<c:url value='verification'/>" class="bubble hMargin">proceed to verification &#x279f;</a>
-        </c:if>
-    </div>
+ <%! 
+       Panier panier = new Panier();
+       Stock stock = new Stock();
+       boolean affichePopUp = false ;
+ %>
+ 
+                     <%-- Première session quand l'utilisateur clique sur le bouton ajouter panier, on dit qu'il doit faire
+                     appel à la méthode ajouter panier qui existe dans la classe Panier
+                     Deuxième session quand l'utilisateur clique sur le bouton passer commande
+                     on lui dit qu'il doit faire appel à la méthode modifier stock qui existe dans la classe Stock
+                     et mettre le panier qui existe dans la session panier à 0--%>
+<%       
+    
+              if (request.getParameter("reference") != null){
+                int ref = Integer.parseInt(request.getParameter("reference")); 
 
-    <c:if test="${!empty phone && phone.numberOfItems != 0}">
+                panier = (Panier)session.getAttribute("panierSession");
+                stock = (Stock)session.getAttribute("stockSession");
+      //lorsque je clique sur le boutton ajouter au panier je récupère la référence du produit ensuite je récupère le panier et le stock qui se trouve dans la seesion 
+      // je vérifie que mon produit est bien disponible dans le stock  si c'est oui il l'ajoute sinon il affiche le POPUP
+                boolean produitDisponible  = panier.verifierDisponibiliteProduit(ref , stock);
+                if ( produitDisponible ){
+                  panier.ajouterAuPanier(ref);
+                  session.setAttribute("panierSession", panier);  
+                }
+                else { 
+                    affichePopUp = true; 
+                }
+              }
+      // quand je clique sur le bouton passer la commande, il mets à jour le stock et il vide le panier dans la session          
+          if ( request.getParameter("panier") != null){
+              panier = (Panier)session.getAttribute("panierSession");
+              stock = (Stock)session.getAttribute("stockSession");
+              stock.modifierStock(panier);
+              panier = new Panier ();
+              session.setAttribute("panierSession", panier);     
+           }
+ %>
+ 
+ 
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="stylesheet" type="text/css" href="newcss.css" /> 
+        <title>JSP Page</title>
+     <style>   
+   body {
+  background-color: lightblue;
+}
+</style>
+    </head>
+    
+    <body>
+       
+        <center><h1>Vente de téléphone en ligne</h1>
+        <center><h2> Liste des téléphones disponibles:</h2>
+       
+            
+           
+        <table>
+            <%=panier%>
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Reference</th>
+                    <th>Nom</th>
+                    <th>Prix</th>
+                    <th>Quantite</th>
+                    <th></th>
+                    
+                </tr>
+                
+            </thead>
+            
+            <tbody>
+                
 
-      <h4 id="subtotal">subtotal: &euro; ${phone.subtotal}</h4>
+                <% 
+                  Stock stock = (Stock)session.getAttribute("stockSession");                 
+                  for ( int i = 0; i< stock.getListeProduit().size(); i++){%>
+                
+                <tr> 
 
-      <table id="afficheProduitTable">
+                    <td><img src=<%="photos/" + stock.getListeProduit().get(i).getImage()%> </td>                   
+                    <td><%=stock.getListeProduit().get(i).getRef()%></td>
+                    <td><%=stock.getListeProduit().get(i).getNom()%></td>
+                    <td><%=stock.getListeProduit().get(i).getPrix()%></td>
+                    <td><%=stock.getListeProduit().get(i).getQuantite()%></td>
+            
+                <from action="afficheProduit.jsp" method="POST">
+                    <input type="hidden" value="<%=stock.getListeProduit().get(i).getRef()%>" name="reference">
+                
+                    <td> <INPUT TYPE="submit" VALUE="Ajouter au panier"></td>
+                    
+                    <% if (affichePopUp) {  // javascript%>
+                         <script> alert("Le produit n'est plus disponible"); </script>  
+                    <% }
 
-        <tr class="header">
-            <th>mobilephones</th>
-            <th>nom</th>
-            <th>prix</th>
-            <th>quantity</th>
-        </tr>
-
-        <c:forEach var="phoneItem" items="${phone.items}" varStatus="iter">
-
-          <c:set var="mobilephones" value="${phoneItem.mobilephones}"/>
-
-          <tr class="${((iter.index % 2) == 0) ? 'lightBlue' : 'white'}">
-            <td>
-              <img src="${initParam.mobilephonesPhotoPath}${mobilephones.nom}.jpg"
-                   alt="${mobilephones.nom}">
-            </td>
-
-            <td>${mobilephones.nom}</td>
-
-            <td>
-                &euro; ${phoneItem.total}
-                <br>
-                <span class="smallText">( &euro; ${mobilephones.prix} / unit )</span>
-            </td>
-
-            <td>
-                <form action="<c:url value='ajoutPanier'/>" method="post">
-                    <input type="hidden"
-                           name="mobilephoneId"
-                           value="${mobilephone.id}">
-                    <input type="text"
-                           maxlength="2"
-                           size="2"
-                           value="${phoneItem.quantity}"
-                           name="quantity"
-                           style="margin:5px">
-                    <input type="submit"
-                           name="submit"
-                           value="ajout">
+                    affichePopUp =false;%> 
+                
                 </form>
-            </td>
-          </tr>
+                </tr>
+            
+                <%}%>
+            </tbody>
+            
+        </table>
+            
+            <br></br>
+                 <form action="afficheProduit.jsp" method="POST">
+                     <INPUT TYPE="hidden" VALUE="<%=true%>" name="panier">
+                     <td> <INPUT TYPE="submit" VALUE="Passer la commande"></td>
+                 </form>
 
-        </c:forEach>
-
-      </table>
-
-    </c:if>
-</div>
+    </body>
+</html>
