@@ -40,24 +40,54 @@ public class TestServ extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         if (request.getParameter("reference") == null) {
-            mobilephonesFacade.init();
+            if (mobilephonesFacade.findAll().isEmpty()) {
+                mobilephonesFacade.init();
+            }
             ArrayList<Integer> panier = new ArrayList<>();
             request.getSession().setAttribute("panier", panier);
+            int testint = 10;
+            request.getSession().setAttribute("test", testint);
         } else {
-        int ref = Integer.parseInt(request.getParameter("ID"));
-        ArrayList panier = (ArrayList)request.getSession().getAttribute("panier");
-        panier.add(ref);
+            if (request.getParameter("commande") != null) {
+                int testint = 30;
+                request.getSession().setAttribute("test", testint);
+                ArrayList panier = (ArrayList) request.getSession().getAttribute("panier");
 
-        
-        if (request.getParameter("commande") == "true"){
-        
-        List<Product> name = mobilephonesFacade.findAll();
-        for (Product p : name) {
-        p.setPrix(1000);
-        mobilephonesFacade.edit(p);
-        
-        } 
+                for (Object atr : panier) {
+                    Integer atrInt = Integer.parseInt(atr.toString());
+                    List<Product> name = mobilephonesFacade.findAll();
+                    for (Product p : name) {
+                        p.setPrix(1000);
+                        mobilephonesFacade.edit(p);
+                        if (p.getId() == atrInt) {
+                            p.deduitQuant();
+                            p.setPrix(2000);
+                            mobilephonesFacade.edit(p);
+                        }
+                    }
+                }
+
+            } else {
+                Integer ref = Integer.parseInt(request.getParameter("ID"));
+                int testint = 20;
+                request.getSession().setAttribute("test", testint);
+                ArrayList panier = (ArrayList) request.getSession().getAttribute("panier");
+                panier.add(ref);
+                request.getSession().setAttribute("panier", panier);
+            }
+
         }
+
+        /**
+         * if (request.getParameter("commande") == "true") {
+         *
+         * List<Product> name = mobilephonesFacade.findAll(); for (Product p :
+         * name) { p.setPrix(1000); mobilephonesFacade.edit(p);
+         *
+         * }
+         * }
+         *
+         */
         //for ( Object atr : panier){
         //    int atrInt = (Integer)atr; 
         //        List<Product> name = mobilephonesFacade.findAll();
@@ -67,12 +97,13 @@ public class TestServ extends HttpServlet {
         //            mobilephonesFacade.edit(p);
         //        }
         //        }
-            //mobilephonesFacade.find(atrInt).setPrix(1000);
-      //  }
-        }
-        ArrayList panier = (ArrayList)request.getSession().getAttribute("panier");
+        //mobilephonesFacade.find(atrInt).setPrix(1000);
+        //  }
+        //ArrayList panier = (ArrayList) request.getSession().getAttribute("panier");
+        int testint = (Integer) request.getSession().getAttribute("test");
         List<Product> name = mobilephonesFacade.findAll();
-        
+
+        ArrayList panier = (ArrayList) request.getSession().getAttribute("panier");
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
@@ -82,6 +113,7 @@ public class TestServ extends HttpServlet {
             out.println("</head>");
             out.println("<body>");
             out.println(panier);
+            out.println(testint);
 
             out.println("<table align=center border=\"1\">");
             out.println("<thead>");
@@ -95,32 +127,33 @@ public class TestServ extends HttpServlet {
             for (Product p : name) {
                 out.println("<tr>");
                 out.println("<td>" + p.getId() + "</td>");
-                out.println("<td>" + p.getName()+ "</td>");
+                out.println("<td>" + p.getName() + "</td>");
                 out.println("<td>" + p.getPrix() + "</td>");
                 out.println("<td>" + p.getQuantity() + "</td>");
-    
+
                 out.write("<form action=\"#\" method=\"POST\">\n");
                 out.write("<input type=\"hidden\" value=\"true");
                 out.write("\" name=\"reference\">\n");
-                out.write("<input type=\"hidden\" value=\""+ p.getId()+"");
+                out.write("<input type=\"hidden\" value=\"" + p.getId() + "");
                 out.write("\" name=\"ID\">\n");
                 out.write("\n");
                 out.write("<td> <INPUT TYPE=\"submit\" VALUE=\"Ajouter au panier\"></td>\n");
                 out.write("\n");
                 out.write("</form>");
-                
+
                 out.println("</tr>");
 
             }
-            
-                  out.write("                 <form action=\"#\" method=\"POST\">\n");
-      out.write("                     <INPUT TYPE=\"hidden\" VALUE=\"true");
-      out.write("\" name=\"commande\">\n");
-      out.write("                     <td> <INPUT TYPE=\"submit\" VALUE=\"Passer la commande\"></td>\n");
- 
-      out.write("                 </form>\n");
+
+            out.write("<form action=\"#\" method=\"POST\">\n");
+            out.write("<INPUT TYPE=\"hidden\" VALUE=\"true");
+            out.write("\" name=\"commande\">\n");
+            out.write("<td> <INPUT TYPE=\"submit\" VALUE=\"Passer la commande\"></td>\n");
+            out.write("<input type=\"hidden\" value=\"true");
+            out.write("\" name=\"reference\">\n");
+            out.write("</form>\n");
             out.println("</body>");
-         
+
             out.println("</html>");
         }
     }

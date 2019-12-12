@@ -37,7 +37,7 @@ public class Product implements Serializable {
     @NotNull
     @Column(name = "ID")
     private Integer id;
-    @Size(max = 15)
+    @Size(max = 30)
     @Column(name = "NAME")
     private String name;
     @Column(name = "PRIX")
@@ -88,6 +88,7 @@ public class Product implements Serializable {
         int q = this.quantity;
         if (q > 0){
         q = q - 1;
+        this.quantity = q;
         }
     }
     
