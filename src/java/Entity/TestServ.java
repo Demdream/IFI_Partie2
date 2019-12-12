@@ -45,32 +45,29 @@ public class TestServ extends HttpServlet {
             }
             ArrayList<Integer> panier = new ArrayList<>();
             request.getSession().setAttribute("panier", panier);
-            int testint = 10;
-            request.getSession().setAttribute("test", testint);
+
         } else {
             if (request.getParameter("commande") != null) {
-                int testint = 30;
-                request.getSession().setAttribute("test", testint);
-                ArrayList panier = (ArrayList) request.getSession().getAttribute("panier");
 
+                ArrayList panier = (ArrayList) request.getSession().getAttribute("panier");
+                List<Product> name = mobilephonesFacade.findAll();
                 for (Object atr : panier) {
                     Integer atrInt = Integer.parseInt(atr.toString());
-                    List<Product> name = mobilephonesFacade.findAll();
+                    
                     for (Product p : name) {
-                        p.setPrix(1000);
+
                         mobilephonesFacade.edit(p);
                         if (p.getId() == atrInt) {
                             p.deduitQuant();
-                            p.setPrix(2000);
                             mobilephonesFacade.edit(p);
                         }
                     }
                 }
-
+                panier.clear();
+                request.getSession().setAttribute("panier", panier);
+               
             } else {
                 Integer ref = Integer.parseInt(request.getParameter("ID"));
-                int testint = 20;
-                request.getSession().setAttribute("test", testint);
                 ArrayList panier = (ArrayList) request.getSession().getAttribute("panier");
                 panier.add(ref);
                 request.getSession().setAttribute("panier", panier);
@@ -78,29 +75,6 @@ public class TestServ extends HttpServlet {
 
         }
 
-        /**
-         * if (request.getParameter("commande") == "true") {
-         *
-         * List<Product> name = mobilephonesFacade.findAll(); for (Product p :
-         * name) { p.setPrix(1000); mobilephonesFacade.edit(p);
-         *
-         * }
-         * }
-         *
-         */
-        //for ( Object atr : panier){
-        //    int atrInt = (Integer)atr; 
-        //        List<Product> name = mobilephonesFacade.findAll();
-        //        for (Product p : name){
-        //        if (p.getId() == atrInt){
-        //            p.deduitQuant();
-        //            mobilephonesFacade.edit(p);
-        //        }
-        //        }
-        //mobilephonesFacade.find(atrInt).setPrix(1000);
-        //  }
-        //ArrayList panier = (ArrayList) request.getSession().getAttribute("panier");
-        int testint = (Integer) request.getSession().getAttribute("test");
         List<Product> name = mobilephonesFacade.findAll();
 
         ArrayList panier = (ArrayList) request.getSession().getAttribute("panier");
@@ -113,7 +87,7 @@ public class TestServ extends HttpServlet {
             out.println("</head>");
             out.println("<body>");
             out.println(panier);
-            out.println(testint);
+
 
             out.println("<table align=center border=\"1\">");
             out.println("<thead>");
